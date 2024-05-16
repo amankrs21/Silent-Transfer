@@ -1,0 +1,14 @@
+First Create a Virtual Environment using-
+python -m venv venv
+
+then activate this venv using-
+venv\Scripts\activate
+
+then install flask using-
+pip install flask
+
+now we can use-
+SET FLASK_APP=app.py
+
+and to run server in the network mode-
+flask run --host="0.0.0.0"
