@@ -1,12 +1,15 @@
 from flask import Flask, render_template, request
 
+
 app = Flask(__name__)
+
 
 # Set the upload folder
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 # Maximum allowed file size is 16 MB
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 
 # Ensure the upload folder exists
 import os
