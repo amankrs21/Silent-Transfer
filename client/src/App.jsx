@@ -4,7 +4,9 @@ import {
 } from '@mui/material';
 
 // local imports
+import ErrorPage from './components/ErrorPage';
 import PairingScreen from './components/PairingScreen';
+import ErrorBoundary from './middleware/ErrorBoundary';
 import ConnectedScreen from './components/ConnectedScreen';
 import { useWebSocket } from './utils/useWebSocket';
 import { generatePairingKey } from './utils/generatePairingKey';
@@ -86,7 +88,7 @@ export default function App() {
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <>
+    <ErrorBoundary fallback={<ErrorPage />}>
       <CssBaseline />
       <Box
         sx={{
@@ -124,6 +126,6 @@ export default function App() {
           />
         )}
       </Container>
-    </>
+    </ErrorBoundary>
   );
 }
