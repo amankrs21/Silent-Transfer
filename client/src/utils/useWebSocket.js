@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 export const useWebSocket = (pairingKey, onMessage) => {
     const ws = useRef(null);
     const [isConnected, setIsConnected] = useState(false);
-    const backendUrl = 'ws://whisper-sphere.azurewebsites.net/ws';
+    const backendUrl = 'wss://whisper-sphere.azurewebsites.net/ws';
 
     useEffect(() => {
         ws.current = new WebSocket(backendUrl);

@@ -40,8 +40,8 @@ const PairingScreen = ({ pairingKey, onConnect }) => {
             <Button
                 fullWidth
                 variant="contained"
-                disabled={!inputKey}
                 endIcon={<LoginIcon />}
+                disabled={inputKey.length !== 6}
                 onClick={() => onConnect(inputKey)}
                 sx={{ maxWidth: 250 }}
             >
