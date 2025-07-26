@@ -1,6 +1,9 @@
+import AppHeader from './layout/AppHeader.jsx';
 
 export default function App() {
   return (
-    <div>App</div>
+    <div>
+      <AppHeader />
+    </div>
   )
 }
