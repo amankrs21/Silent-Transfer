@@ -9,11 +9,20 @@ import { Login as LoginIcon } from '@mui/icons-material';
 
 // PairingScreen component
 const PairingScreen = ({ pairingKey, onConnect }) => {
+    const [inputKey, setInputKey] = useState('');
+
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
     const barCodeValue = `${window.location.href}?pairingKey=${pairingKey}`;
 
-    const [inputKey, setInputKey] = useState('');
+    const onPairingKeySend = (key) => {
+        if (!key || key.length !== 6) return;
+        if (key === pairingKey) {
+            alert('You cannot connect to yourself!');
+        } else {
+            onConnect(key);
+        }
+    };
 
     return (
         <Container sx={{ mt: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -31,10 +40,15 @@ const PairingScreen = ({ pairingKey, onConnect }) => {
                 margin='normal'
                 value={inputKey}
                 label="Enter Partner's Pairing Key"
-                placeholder='6-character key'
+                placeholder='6-character pairing key'
                 inputProps={{ maxLength: 6 }}
                 sx={{ minWidth: isSmall ? 250 : 300 }}
                 onChange={(e) => setInputKey(e.target.value.toUpperCase())}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        onPairingKeySend(inputKey);
+                    }
+                }}
             />
 
             <Button
@@ -42,7 +56,7 @@ const PairingScreen = ({ pairingKey, onConnect }) => {
                 variant="contained"
                 endIcon={<LoginIcon />}
                 disabled={inputKey.length !== 6}
-                onClick={() => onConnect(inputKey)}
+                onClick={() => onPairingKeySend(inputKey)}
                 sx={{ maxWidth: 250 }}
             >
                 Connect
