@@ -34,21 +34,21 @@ app.router.routes.append(
 )
 
 """---------------- Use this section to serve static files if needed.----------------"""
-# # Serve static React build files
-# build_path = os.path.join(os.path.dirname(__file__), "client/dist")
-# app.mount("/static", StaticFiles(directory=build_path), name="static")
+# Serve static React build files
+build_path = os.path.join(os.path.dirname(__file__), "client/dist")
+app.mount("/static", StaticFiles(directory=build_path), name="static")
 
-# # Serve index.html for non-API, non-static routes
-# @app.get("/{full_path:path}")
-# async def serve_react(request: Request, full_path: str):
-#     if "." in full_path:  # likely a static file like .js or .css that was missed
-#         file_path = os.path.join(build_path, full_path)
-#         if os.path.exists(file_path):
-#             return FileResponse(file_path)
-#         return JSONResponse({"error": "File not found"}, status_code=404)
+# Serve index.html for non-API, non-static routes
+@app.get("/{full_path:path}")
+async def serve_react(request: Request, full_path: str):
+    if "." in full_path:  # likely a static file like .js or .css that was missed
+        file_path = os.path.join(build_path, full_path)
+        if os.path.exists(file_path):
+            return FileResponse(file_path)
+        return JSONResponse({"error": "File not found"}, status_code=404)
 
-#     # fallback to index.html for React Router or unknown paths
-#     return FileResponse(os.path.join(build_path, "index.html"))
+    # fallback to index.html for React Router or unknown paths
+    return FileResponse(os.path.join(build_path, "index.html"))
 """------------------------------------------------------------------------------------"""
 
 # 404 handler
@@ -69,3 +69,10 @@ if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", 5000))
     uvicorn.run("app:app", host=host, port=port, reload=True)
+
+
+"""
+------------ HOSTING NOTES ------------
+SETUP BELOW COMMAND IN THE STARTUP SCRIPT OF THE SERVER
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app
+"""
