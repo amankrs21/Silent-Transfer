@@ -1,0 +1,30 @@
+{
+  "name": "whisper-share",
+  "version": "1.0.0",
+  "description": "A simple WebRTC-based peer-to-peer file sharing application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js --network"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amankrs21/Whisper-Share.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amankrs21/Whisper-Share/issues"
+  },
+  "homepage": "https://github.com/amankrs21/Whisper-Share#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "path-to-regexp": "^8.2.0",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
