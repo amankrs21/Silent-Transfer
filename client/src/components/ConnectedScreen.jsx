@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import {
     Container, Card, Typography, Button, Grid, IconButton, Tooltip,
-    LinearProgress, List, ListItem, ListItemText, ListItemIcon
+    LinearProgress, List, ListItem, ListItemText, ListItemIcon, Alert, Box
 } from '@mui/material';
 import {
-    Logout, CloudUpload, CloudDone, CloudDownload, Send as SendIcon
+    Logout, CloudUpload, CloudDone, CloudDownload, Send as SendIcon, WarningAmber
 } from '@mui/icons-material';
 
+const MAX_FILE_SIZE_MB = 50;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
-// ConnectedScreen component
 const ConnectedScreen = ({
     partnerId,
     sendFileMetadata,
@@ -20,11 +21,18 @@ const ConnectedScreen = ({
     const [sentFiles, setSentFiles] = useState([]);
     const [sendProgress, setSendProgress] = useState(0);
     const [isSending, setIsSending] = useState(false);
+    const [fileError, setFileError] = useState('');
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            if (file.size > MAX_FILE_SIZE_BYTES) {
+                setFileError(`❌ File exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
+                setSelectedFile(null);
+                return;
+            }
             setSelectedFile(file);
+            setFileError('');
             setSendProgress(0);
         }
     };
@@ -89,32 +97,31 @@ const ConnectedScreen = ({
     };
 
     return (
-        <Container sx={{ mt: 2 }}>
-            <Typography variant="h5" textAlign="center" sx={{ mb: 3 }}>
-                <strong>✅ Connected to Partner: </strong><br />{partnerId}
+        <Container sx={{ mt: 4 }}>
+            <Typography variant="h5" align="center" gutterBottom>
+                ✅ <strong>Connected to:</strong> {partnerId}
             </Typography>
 
-            <Grid container justifyContent="space-evenly" size={{ xs: 12, md: 12 }} gap={1}>
-                <Grid size={{ xs: 12, md: 5 }}>
+            <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
+                <Grid item xs={12} md={5}>
                     <Button
                         fullWidth
                         color='error'
-                        component="label"
                         variant="contained"
                         startIcon={<Logout />}
                         onClick={() => window.location.reload()}
-                        sx={{ height: '42px', fontSize: '1rem' }}
+                        sx={{ height: '42px', fontWeight: 600 }}
                     >
                         Disconnect
                     </Button>
                 </Grid>
-                <Grid size={{ xs: 12, md: 5 }}>
+                <Grid item xs={12} md={5}>
                     <Button
                         fullWidth
                         component="label"
                         variant="contained"
                         startIcon={<CloudUpload />}
-                        sx={{ height: '42px', fontSize: '1rem' }}
+                        sx={{ height: '42px', fontWeight: 600 }}
                     >
                         Choose File
                         <input type="file" hidden onChange={handleFileChange} />
@@ -122,43 +129,55 @@ const ConnectedScreen = ({
                 </Grid>
             </Grid>
 
+            <Box mt={1} textAlign="center">
+                <Typography variant="body2" color="text.secondary">
+                    ⚠️ Maximum file size allowed: <strong>{MAX_FILE_SIZE_MB}MB</strong>
+                </Typography>
+            </Box>
+
+            {fileError && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                    <WarningAmber fontSize="small" sx={{ mr: 1 }} /> {fileError}
+                </Alert>
+            )}
+
             {selectedFile && (
-                <Card variant="outlined" sx={{ mt: 2, p: 1, textAlign: 'center' }}>
-                    <Typography gutterBottom>
-                        {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
+                <Card variant="outlined" sx={{ mt: 3, p: 2 }}>
+                    <Typography variant="subtitle1" align="center" gutterBottom>
+                        Selected: <strong>{selectedFile.name}</strong> ({Math.round(selectedFile.size / 1024)} KB)
                     </Typography>
-                    <Button
-                        color="primary"
-                        variant="outlined"
-                        onClick={sendFile}
-                        endIcon={<SendIcon />}
-                        disabled={isSending}
-                    >
-                        Send File
-                    </Button>
+                    <Box textAlign="center">
+                        <Button
+                            color="primary"
+                            variant="contained"
+                            onClick={sendFile}
+                            endIcon={<SendIcon />}
+                            disabled={isSending}
+                        >
+                            Send File
+                        </Button>
+                    </Box>
                     {isSending && (
                         <LinearProgress
                             variant="determinate"
                             value={sendProgress}
-                            sx={{ mt: 2, width: '100%' }}
+                            sx={{ mt: 2 }}
                         />
                     )}
                 </Card>
             )}
 
             {sentFiles.length > 0 && (
-                <Card variant="outlined" sx={{ mt: 2, p: 1 }}>
-                    <Typography variant="h6">📤 Sent Files</Typography>
-                    <List>
+                <Card variant="outlined" sx={{ mt: 3, p: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                        📤 Sent Files
+                    </Typography>
+                    <List dense>
                         {sentFiles.map((file, i) => (
                             <ListItem key={i}>
                                 <ListItemIcon><CloudDone color="success" /></ListItemIcon>
                                 <ListItemText
-                                    primary={
-                                        file.length > 50
-                                            ? file.slice(0, 50) + '...'
-                                            : file
-                                    }
+                                    primary={file.length > 50 ? file.slice(0, 50) + '...' : file}
                                 />
                             </ListItem>
                         ))}
@@ -167,19 +186,24 @@ const ConnectedScreen = ({
             )}
 
             {incomingFiles && incomingFiles.length > 0 && (
-                <Card variant="outlined" sx={{ mt: 2, p: 1 }}>
-                    <Typography variant="h6">📥 Received Files</Typography>
-                    <List>
+                <Card variant="outlined" sx={{ mt: 3, p: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                        📥 Received Files
+                    </Typography>
+                    <List dense>
                         {incomingFiles.map((file, index) => (
-                            <ListItem key={index} secondaryAction={
-                                <Tooltip title="Download File">
-                                    {file.completed && (
-                                        <IconButton color='primary' onClick={() => downloadFile(file)}>
-                                            <CloudDownload />
-                                        </IconButton>
-                                    )}
-                                </Tooltip>
-                            }>
+                            <ListItem
+                                key={index}
+                                secondaryAction={
+                                    file.completed && (
+                                        <Tooltip title="Download File">
+                                            <IconButton color='primary' onClick={() => downloadFile(file)}>
+                                                <CloudDownload />
+                                            </IconButton>
+                                        </Tooltip>
+                                    )
+                                }
+                            >
                                 <ListItemText
                                     primary={`${file.name.length > 40
                                         ? file.name.slice(0, 40) + '...'
